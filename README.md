@@ -10,6 +10,16 @@
 go get home.naturgift.fun/aiwork/travelog-license-verify
 ```
 
+> ⚠️ 这是一个私有仓库，Go 需要额外配置才能下载：
+>
+> ```bash
+> # 1. 告诉 Go 这个域名不走代理
+> go env -w GOPRIVATE=home.naturgift.fun
+>
+> # 2. 配置 Git 用 SSH 认证
+> git config --global url."ssh://git@home.naturgift.fun:2222/".insteadOf "https://home.naturgift.fun/"
+> ```
+
 ## 快速开始
 
 ### 最简用法（一行验证）
