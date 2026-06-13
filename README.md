@@ -7,7 +7,7 @@
 ## 安装
 
 ```bash
-go get gitea.app/travelog/travelog-license-verify
+go get home.naturgift.fun/aiwork/travelog-license-verify
 ```
 
 ## 快速开始
@@ -19,7 +19,7 @@ package main
 
 import (
     "fmt"
-    "gitea.app/travelog/travelog-license-verify"
+    "home.naturgift.fun/aiwork/travelog-license-verify"
 )
 
 func main() {
@@ -86,7 +86,7 @@ result, err := client.Heartbeat(ctx, "license-key-xxx", "device-fingerprint")
 ```go
 import (
     "github.com/go-chi/chi/v5"
-    "gitea.app/travelog/travelog-license-verify"
+    "home.naturgift.fun/aiwork/travelog-license-verify"
 )
 
 r := chi.NewRouter()

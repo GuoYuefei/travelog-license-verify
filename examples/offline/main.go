@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"gitea.app/travelog/travelog-license-verify"
+	"home.naturgift.fun/aiwork/travelog-license-verify"
 )
 
 func main() {

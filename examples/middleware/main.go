@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"gitea.app/travelog/travelog-license-verify"
+	"home.naturgift.fun/aiwork/travelog-license-verify"
 )
 
 func main() {

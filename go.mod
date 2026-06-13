@@ -1,4 +1,4 @@
-module gitea.app/travelog/travelog-license-verify
+module home.naturgift.fun/aiwork/travelog-license-verify
 
 go 1.26.1
 
