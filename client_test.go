@@ -113,6 +113,37 @@ func TestClient_Activate_AlreadyActivated(t *testing.T) {
 	require.Equal(t, "already_activated", result.Status)
 }
 
+func TestClient_Activate_ReplaceOldest(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Verify the request has ReplaceOldest true
+		var req ActivateRequest
+		json.NewDecoder(r.Body).Decode(&req)
+		require.True(t, req.ReplaceOldest)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(ActivateResult{
+			Status: "activated",
+			Device: map[string]any{"id": "dev-002", "fingerprint": "fp-456"},
+			ReplacedDevice: map[string]any{"id": "dev-001", "fingerprint": "fp-123"},
+		})
+	}))
+	defer ts.Close()
+
+	client := NewClient(ts.URL)
+	result, err := client.Activate(context.Background(), ActivateRequest{
+		LicenseKey:        "test-key",
+		DeviceFingerprint: "fp-456",
+		Hostname:          "pc2",
+		Platform:          "windows",
+		ReplaceOldest:     true,
+	})
+	require.NoError(t, err)
+	require.Equal(t, "activated", result.Status)
+	require.NotNil(t, result.ReplacedDevice)
+	replaced := result.ReplacedDevice.(map[string]any)
+	require.Equal(t, "dev-001", replaced["id"])
+}
+
 func TestClient_Activate_TooManyDevices(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

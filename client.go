@@ -40,6 +40,9 @@ type ActivateRequest struct {
 	DeviceFingerprint string `json:"device_fingerprint"`
 	Hostname          string `json:"hostname,omitempty"`
 	Platform          string `json:"platform,omitempty"`
+	// ReplaceOldest, when true, tells the server to evict the oldest activated
+	// device if the maximum device count has been reached, and activate this one instead.
+	ReplaceOldest bool `json:"replace_oldest,omitempty"`
 }
 
 // ActivateResult is the response from the device activation endpoint.
@@ -47,6 +50,8 @@ type ActivateResult struct {
 	Status string `json:"status"`
 	Device any    `json:"device,omitempty"`
 	Error  string `json:"error,omitempty"`
+	// ReplacedDevice is set when the activation triggered an eviction of an older device.
+	ReplacedDevice any `json:"replaced_device,omitempty"`
 }
 
 // HeartbeatResult is the response from the heartbeat endpoint.
@@ -233,6 +238,30 @@ func (c *Client) ActivateLocalDevice(ctx context.Context, licenseKey string) (*A
 		DeviceFingerprint: fp,
 		Hostname:          Hostname(),
 		Platform:          Platform(),
+	})
+}
+
+// ActivateReplaceOldest activates the current machine on the given license,
+// automatically evicting the oldest activated device if the maximum device
+// count has been reached.
+//
+// This is a convenience method that detects the local device fingerprint,
+// hostname, and platform automatically, then sends the activation request
+// with ReplaceOldest set to true.
+//
+//	result, err := client.ActivateReplaceOldest(ctx, licenseKey)
+func (c *Client) ActivateReplaceOldest(ctx context.Context, licenseKey string) (*ActivateResult, error) {
+	fp, err := DeviceFingerprint(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("verify client: cannot get device fingerprint: %w", err)
+	}
+
+	return c.Activate(ctx, ActivateRequest{
+		LicenseKey:        licenseKey,
+		DeviceFingerprint: fp,
+		Hostname:          Hostname(),
+		Platform:          Platform(),
+		ReplaceOldest:     true,
 	})
 }
 

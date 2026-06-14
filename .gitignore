@@ -3,3 +3,6 @@
 *.out
 .DS_Store
 Thumbs.db
+
+# AI tool runtime data
+.omo/
