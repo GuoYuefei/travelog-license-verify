@@ -3,9 +3,32 @@ package verify
 import (
 	"context"
 	"fmt"
+	"os/exec"
+	"strings"
+	"time"
 
 	"github.com/slashdevops/machineid"
 )
+
+const defaultCommandTimeout = 5 * time.Second
+
+// hideWindowExecutor implements machineid.CommandExecutor with HideWindow
+// on Windows to prevent console windows from flashing when wmic/PowerShell
+// commands are run for hardware fingerprinting.
+type hideWindowExecutor struct{}
+
+func (e *hideWindowExecutor) Execute(ctx context.Context, name string, args ...string) (string, error) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, defaultCommandTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(timeoutCtx, name, args...)
+	hideWindow(cmd)
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("command %s: %w", name, err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}
 
 // DeviceFingerprint generates a hardware-bound device identifier
 // using CPU information, motherboard serial, and MAC addresses.
@@ -16,6 +39,7 @@ import (
 // The fingerprint is computed as SHA-256(CPU + Motherboard + MAC).
 func DeviceFingerprint(ctx context.Context) (string, error) {
 	id, err := machineid.New().
+		WithExecutor(&hideWindowExecutor{}).
 		WithCPU().
 		WithMotherboard().
 		WithMAC().
