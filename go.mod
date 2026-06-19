@@ -1,4 +1,4 @@
-module home.naturgift.fun/aiwork/travelog-license-verify
+module github.com/GuoYuefei/travelog-license-verify
 
 go 1.26.1
 
